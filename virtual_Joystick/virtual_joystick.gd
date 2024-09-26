@@ -8,6 +8,7 @@ func _ready() -> void:
 		center_point = global_position + ((texture_normal.get_size() / 2) * scale)
 	shape = CircleShape2D.new()
 	shape.radius = range
+	$point.visibility_mode = visibility_mode
 
 func get_joystick_input() -> Vector2:
 	return $point.position.normalized() * ($point.position / range)
