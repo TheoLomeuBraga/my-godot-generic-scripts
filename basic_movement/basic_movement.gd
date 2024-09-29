@@ -42,7 +42,8 @@ func move(delta) -> void:
 		else:
 			new_move_direction = move_direction
 	
-	
+	if new_move_direction == Vector3.ZERO:
+		new_move_direction = move_direction
 	
 	if air_control and move_direction == Vector3.ZERO:
 		linear_velocity.x = 0
@@ -68,9 +69,10 @@ func move(delta) -> void:
 			
 			linear_velocity.x = new_velocity.x
 			if new_velocity.y < 0 and not juping:
-				linear_velocity.y = new_velocity.y
+				linear_velocity.y = new_velocity.y - delta
 			linear_velocity.z = new_velocity.z
-			
+	
+	
 	if move_direction_last_frame != Vector3.ZERO and move_direction == Vector3.ZERO and not (sliding_time > 0 or not in_floor):
 		linear_velocity = Vector3.ZERO
 	
@@ -101,6 +103,7 @@ func _on_body_entered(body) -> void:
 			sliding_time = 1
 			physics_material_override.friction = 0
 			linear_velocity += (body.linear_velocity * body.mass) / mass
+
 
 
 func movement_plugin(delta) -> void:
