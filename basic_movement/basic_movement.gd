@@ -25,7 +25,7 @@ func move(delta) -> void:
 	if move_direction.length() > 0:
 		physics_material_override.friction = 0
 	elif sliding_time <= 0:
-		physics_material_override.friction = 10
+		physics_material_override.friction = 1000
 	
 	var new_move_direction : Vector3 = move_direction
 	
@@ -39,6 +39,9 @@ func move(delta) -> void:
 		else:
 			new_move_direction = move_direction
 	
+	if air_control and move_direction == Vector3.ZERO:
+		linear_velocity.x = 0
+		linear_velocity.z = 0
 	
 	if new_move_direction != Vector3.ZERO:
 		new_move_direction = new_move_direction.normalized()
