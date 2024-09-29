@@ -3,9 +3,12 @@ class_name BasicMovement
 
 var sliding_time := 0.0
 
+var in_floor_last_frame : bool = false
 var in_floor : bool = false
 
 @export var speed := 3.0
+
+var has_jump_recently := 0.0
 
 var move_direction_last_frame : Vector3 = Vector3.ZERO
 @export var move_direction : Vector3 = Vector3.ZERO
@@ -16,14 +19,12 @@ var move_direction_last_frame : Vector3 = Vector3.ZERO
 
 func jump() -> void:
 	linear_velocity.y = jump_power
+	has_jump_recently = 0.1
 
 func move(delta) -> void:
 	
 	
-	if move_direction.length() > 0:
-		physics_material_override.friction = 0
-	elif sliding_time <= 0:
-		physics_material_override.friction = 1000
+	
 	
 	var new_move_direction : Vector3 = move_direction
 	
@@ -36,6 +37,8 @@ func move(delta) -> void:
 			new_move_direction = move_direction.slide($floorChekerShape.get_collision_normal(0)).normalized()
 		else:
 			new_move_direction = move_direction
+	
+	
 	
 	if air_control and move_direction == Vector3.ZERO:
 		linear_velocity.x = 0
@@ -60,7 +63,7 @@ func move(delta) -> void:
 			new_velocity = new_velocity.normalized() * min(new_velocity.length(), speed)
 			
 			linear_velocity.x = new_velocity.x
-			if new_velocity.y < 0:
+			if new_velocity.y < 0 and has_jump_recently <= 0:
 				linear_velocity.y = new_velocity.y
 			linear_velocity.z = new_velocity.z
 			
@@ -70,7 +73,10 @@ func move(delta) -> void:
 	if in_floor:
 		sliding_time -= delta
 	
+	has_jump_recently -= delta
+	
 	move_direction_last_frame = move_direction
+	in_floor_last_frame = in_floor
 
 func _on_body_entered(body) -> void:
 	if body is RigidBody3D:
