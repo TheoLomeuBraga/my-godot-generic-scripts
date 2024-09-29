@@ -3,12 +3,11 @@ class_name BasicMovement
 
 var sliding_time := 0.0
 
-var jump_recently := 0.0
-
 var in_floor : bool = false
 
 @export var speed := 3.0
 
+var move_direction_last_frame : Vector3 = Vector3.ZERO
 @export var move_direction : Vector3 = Vector3.ZERO
 
 @export var jump_power := 3.0
@@ -17,7 +16,6 @@ var in_floor : bool = false
 
 func jump() -> void:
 	linear_velocity.y = jump_power
-	jump_recently = 0.2
 
 func move(delta) -> void:
 	
@@ -60,16 +58,19 @@ func move(delta) -> void:
 		else:
 			var new_velocity = new_move_direction * speed  * 100 * delta
 			new_velocity = new_velocity.normalized() * min(new_velocity.length(), speed)
+			
 			linear_velocity.x = new_velocity.x
-			if jump_recently <= 0:
+			if new_velocity.y < 0:
 				linear_velocity.y = new_velocity.y
 			linear_velocity.z = new_velocity.z
-	
-	
+			
+	if move_direction_last_frame != Vector3.ZERO and move_direction == Vector3.ZERO and not (sliding_time > 0 or not in_floor):
+		linear_velocity = Vector3.ZERO
 	
 	if in_floor:
 		sliding_time -= delta
-	jump_recently -= delta
+	
+	move_direction_last_frame = move_direction
 
 func _on_body_entered(body) -> void:
 	if body is RigidBody3D:
